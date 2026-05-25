@@ -1,0 +1,725 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  variant?: 'dark' | 'light';
+  title?: string;
+  subtitle?: string;
+  source?: string;
+  compact?: boolean;
+}
+
+const {
+  variant = 'dark',
+  title = 'Обсудим ваш объект',
+  subtitle = 'Передайте имя и контакт — свяжемся в течение рабочего дня, изучим документы и подготовим коммерческое предложение под параметры площадки.',
+  source = 'site',
+  compact = false,
+} = Astro.props;
+
+const accessKey = site.forms.web3formsAccessKey;
+const endpoint = site.forms.endpoint;
+---
+
+<div class={`lead-form-wrap variant-${variant} ${compact ? 'is-compact' : ''}`}>
+  <div class="lead-form-head">
+    <p class="eyebrow lead-form-eyebrow">Заявка</p>
+    <h2 class="lead-form-title">{title}</h2>
+    <p class="lead-form-subtitle">{subtitle}</p>
+  </div>
+
+  <form
+    class="lead-form"
+    action={endpoint}
+    method="post"
+    data-lead-form
+    data-source={source}
+    data-endpoint={endpoint}
+    novalidate
+  >
+    <input type="hidden" name="access_key" value={accessKey} />
+    <input type="hidden" name="from_name" value="Сайт СвайИнжПроект" />
+    <input type="hidden" name="subject" value={`Новая заявка с сайта (${source})`} />
+    <input type="hidden" name="source" value={source} />
+    <input type="hidden" name="page_url" value="" data-page-url />
+    <input
+      type="checkbox"
+      name="botcheck"
+      tabindex="-1"
+      autocomplete="off"
+      class="hp-field"
+      aria-hidden="true"
+    />
+    <input
+      type="text"
+      name="company"
+      tabindex="-1"
+      autocomplete="off"
+      class="hp-field"
+      aria-hidden="true"
+    />
+
+    <div class="field">
+      <label for={`lf-name-${source}`} class="label">
+        Имя <span class="req" aria-hidden="true">*</span>
+      </label>
+      <input
+        id={`lf-name-${source}`}
+        type="text"
+        name="name"
+        autocomplete="name"
+        required
+        minlength="2"
+        maxlength="120"
+        placeholder="Как к вам обращаться"
+        class="input"
+      />
+      <p class="error" data-error="name"></p>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for={`lf-phone-${source}`} class="label">
+          Телефон <span class="req" aria-hidden="true">*</span>
+        </label>
+        <input
+          id={`lf-phone-${source}`}
+          type="tel"
+          name="phone"
+          autocomplete="tel"
+          required
+          inputmode="tel"
+          placeholder="+7 (___) ___-__-__"
+          class="input"
+          pattern="^[\+\d\s\-\(\)]{10,20}$"
+        />
+        <p class="error" data-error="phone"></p>
+      </div>
+
+      <div class="field">
+        <label for={`lf-email-${source}`} class="label">
+          E-mail <span class="req" aria-hidden="true">*</span>
+        </label>
+        <input
+          id={`lf-email-${source}`}
+          type="email"
+          name="email"
+          autocomplete="email"
+          required
+          placeholder="name@company.ru"
+          class="input"
+        />
+        <p class="error" data-error="email"></p>
+      </div>
+    </div>
+
+    <div class="consent-wrap">
+      <label class="consent">
+        <input type="checkbox" name="consent" required class="consent-checkbox" data-consent />
+        <span class="consent-box" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none">
+            <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="square" />
+          </svg>
+        </span>
+        <span class="consent-text">
+          Я согласен на обработку персональных данных в соответствии с
+          <a href="/legal/" target="_blank" rel="noopener">политикой обработки</a>
+        </span>
+      </label>
+      <p class="error" data-error="consent"></p>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-submit">
+        <span class="btn-label">Отправить заявку</span>
+        <span class="btn-loader" aria-hidden="true"></span>
+      </button>
+      <p class="form-note">Ответим в течение рабочего дня</p>
+    </div>
+
+    <div class="form-status" data-status hidden role="status" aria-live="polite"></div>
+  </form>
+</div>
+
+<script>
+  type LeadFormResult = {
+    success?: boolean;
+    message?: string;
+  };
+
+  function initLeadForms() {
+    const forms = document.querySelectorAll<HTMLFormElement>('[data-lead-form]');
+
+    forms.forEach((form) => {
+      const statusEl = form.querySelector<HTMLDivElement>('[data-status]');
+      const submitBtn = form.querySelector<HTMLButtonElement>('.btn-submit');
+      const endpoint = form.dataset.endpoint || 'https://api.web3forms.com/submit';
+      const source = form.dataset.source || 'site';
+
+      const pageUrlInput = form.querySelector<HTMLInputElement>('[data-page-url]');
+      if (pageUrlInput) {
+        pageUrlInput.value = window.location.href;
+      }
+
+      const setError = (field: string, message: string) => {
+        const el = form.querySelector<HTMLParagraphElement>(`[data-error="${field}"]`);
+        if (el) el.textContent = message;
+      };
+
+      const clearErrors = () => {
+        form.querySelectorAll<HTMLParagraphElement>('[data-error]').forEach((el) => {
+          el.textContent = '';
+        });
+        if (statusEl) {
+          statusEl.hidden = true;
+          statusEl.textContent = '';
+          statusEl.className = 'form-status';
+        }
+      };
+
+      const showStatus = (kind: 'success' | 'error', html: string) => {
+        if (!statusEl) return;
+        statusEl.hidden = false;
+        statusEl.className = `form-status is-${kind}`;
+        statusEl.innerHTML = html;
+        statusEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      };
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        clearErrors();
+
+        const data = new FormData(form);
+
+        const honeyText = String(data.get('company') || '').trim();
+        const honeyCheck = data.get('botcheck');
+        if (honeyText || honeyCheck) return;
+
+        const name = String(data.get('name') || '').trim();
+        const phone = String(data.get('phone') || '').trim();
+        const email = String(data.get('email') || '').trim();
+        const consent = data.get('consent');
+
+        let hasError = false;
+
+        if (name.length < 2) {
+          setError('name', 'Укажите имя — минимум 2 символа');
+          hasError = true;
+        }
+
+        const phoneClean = phone.replace(/[\s\-\(\)]/g, '');
+        if (!/^\+?\d{10,15}$/.test(phoneClean)) {
+          setError('phone', 'Введите телефон в международном формате');
+          hasError = true;
+        }
+
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+          setError('email', 'Введите корректный e-mail');
+          hasError = true;
+        }
+
+        if (!consent) {
+          setError('consent', 'Нужно отметить согласие на обработку персональных данных');
+          form.querySelector<HTMLLabelElement>('.consent')?.classList.add('is-invalid');
+          hasError = true;
+        } else {
+          form.querySelector<HTMLLabelElement>('.consent')?.classList.remove('is-invalid');
+        }
+
+        if (hasError) {
+          const firstError = form.querySelector<HTMLElement>('[data-error]:not(:empty)');
+          firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        const composedMessage = [
+          'Новая заявка с сайта СвайИнжПроект',
+          '',
+          `Имя: ${name}`,
+          `Телефон: ${phone}`,
+          `E-mail: ${email}`,
+          '',
+          `Источник: ${source}`,
+          `Страница: ${window.location.href}`,
+          `Время (МСК): ${new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}`,
+        ].join('\n');
+
+        data.set('message', composedMessage);
+        data.set('subject', `Заявка с сайта — ${name} (${phone})`);
+        data.delete('consent');
+        data.delete('company');
+        data.delete('botcheck');
+
+        if (submitBtn) submitBtn.disabled = true;
+        form.classList.add('is-loading');
+
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+            },
+            body: data,
+          });
+
+          let result: LeadFormResult = {};
+          try {
+            result = (await response.json()) as LeadFormResult;
+          } catch {
+            result = { success: response.ok };
+          }
+
+          if (!response.ok || result.success === false) {
+            throw new Error(result.message || 'Не удалось отправить заявку');
+          }
+
+        showStatus(
+          'success',
+          `<svg class="status-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+              <path d="M7.5 12.5l3 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div>
+              <strong>Заявка отправлена.</strong>
+              Свяжемся с вами в течение рабочего дня. Если срочно — звоните <a href="tel:+79182096710">+7 (918) 209-67-10</a>.
+            </div>`,
+        );
+        form.reset();
+
+        if (pageUrlInput) {
+          pageUrlInput.value = window.location.href;
+        }
+      } catch (err) {
+        console.error('Lead form submit failed:', err);
+        showStatus(
+          'error',
+          `<svg class="status-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+              <path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <div>
+              <strong>Не удалось отправить заявку.</strong>
+              Свяжитесь напрямую: <a href="tel:+79182096710">+7 (918) 209-67-10</a> или <a href="mailto:office@svayinzhproekt.ru">office@svayinzhproekt.ru</a>
+            </div>`,
+        );
+      } finally {
+          if (submitBtn) submitBtn.disabled = false;
+          form.classList.remove('is-loading');
+        }
+      });
+
+      form.querySelector<HTMLInputElement>('[data-consent]')?.addEventListener('change', () => {
+        form.querySelector<HTMLLabelElement>('.consent')?.classList.remove('is-invalid');
+        setError('consent', '');
+      });
+
+      const phoneInput = form.querySelector<HTMLInputElement>('input[type="tel"]');
+      phoneInput?.addEventListener('input', () => {
+        let v = phoneInput.value.replace(/\D/g, '');
+        if (v.startsWith('8')) v = '7' + v.slice(1);
+        if (!v.startsWith('7') && v.length > 0) v = '7' + v;
+        v = v.slice(0, 11);
+
+        let formatted = '+7';
+        if (v.length > 1) formatted += ' (' + v.slice(1, 4);
+        if (v.length >= 5) formatted += ') ' + v.slice(4, 7);
+        if (v.length >= 8) formatted += '-' + v.slice(7, 9);
+        if (v.length >= 10) formatted += '-' + v.slice(9, 11);
+
+        phoneInput.value = formatted;
+      });
+    });
+  }
+
+  if (document.readyState !== 'loading') {
+    initLeadForms();
+  } else {
+    document.addEventListener('DOMContentLoaded', initLeadForms);
+  }
+</script>
+
+<style>
+  .lead-form-wrap {
+    container-type: inline-size;
+  }
+
+  .lead-form-head {
+    margin-bottom: 2rem;
+    max-width: 60ch;
+  }
+
+  .lead-form-eyebrow {
+    margin-bottom: 0.5rem;
+  }
+
+  .lead-form-title {
+    margin: 0 0 0.875rem;
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  @media (min-width: 768px) {
+    .lead-form-title {
+      font-size: 2rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .lead-form-title {
+      font-size: 2.375rem;
+    }
+  }
+
+  .lead-form-subtitle {
+    line-height: 1.6;
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  /* Variants */
+  .variant-dark .lead-form-title {
+    color: var(--color-paper);
+  }
+  .variant-dark .lead-form-subtitle {
+    color: var(--color-mute-light);
+  }
+
+  .variant-light .lead-form-title {
+    color: var(--color-ink);
+  }
+  .variant-light .lead-form-subtitle {
+    color: var(--color-mute);
+  }
+
+  /* Form */
+  .lead-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 640px;
+  }
+
+  .hp-field {
+    position: absolute !important;
+    left: -10000px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 560px) {
+    .field-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    color: var(--color-mute);
+  }
+
+  .variant-dark .label {
+    color: var(--color-mute-light);
+  }
+
+  .req {
+    color: var(--color-accent);
+    margin-left: 2px;
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    font-family: var(--font-sans);
+    background: white;
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+    border-radius: 2px;
+    transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+    min-height: 48px;
+  }
+
+  .variant-dark .input {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: transparent;
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(91, 143, 185, 0.18);
+  }
+
+  .input::placeholder {
+    color: var(--color-mute);
+    opacity: 0.7;
+  }
+
+  .input:invalid:not(:placeholder-shown) {
+    border-color: #B23A48;
+  }
+
+  .error {
+    font-size: 0.8125rem;
+    color: #F08080;
+    margin: 0;
+    min-height: 1rem;
+    line-height: 1.3;
+  }
+
+  .variant-light .error {
+    color: #B23A48;
+  }
+
+  /* Consent checkbox */
+  .consent-wrap {
+    margin-top: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    line-height: 1.5;
+    font-size: 0.9375rem;
+  }
+
+  .consent.is-invalid .consent-box {
+    border-color: #B23A48;
+    box-shadow: 0 0 0 3px rgba(178, 58, 72, 0.18);
+  }
+
+  .consent-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .consent-box {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid var(--color-line);
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: border-color 150ms ease-out, background 150ms ease-out, color 150ms ease-out;
+    margin-top: 1px;
+  }
+
+  .variant-dark .consent-box {
+    border-color: var(--color-mute-light);
+  }
+
+  .consent:hover .consent-box {
+    border-color: var(--color-accent);
+  }
+
+  .consent-checkbox:checked ~ .consent-box {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+  }
+
+  .consent-checkbox:focus-visible ~ .consent-box {
+    box-shadow: 0 0 0 3px rgba(91, 143, 185, 0.3);
+  }
+
+  .consent-box svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .consent-text {
+    color: var(--color-mute);
+  }
+
+  .variant-dark .consent-text {
+    color: var(--color-mute-light);
+  }
+
+  .consent-text a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    align-items: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  @media (min-width: 560px) {
+    .actions {
+      flex-direction: row;
+      align-items: center;
+      gap: 1.25rem;
+    }
+  }
+
+  .btn-submit {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.875rem;
+    background: var(--color-accent);
+    color: var(--color-accent-on);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    min-height: 48px;
+    transition: background 150ms ease-out, transform 150ms ease-out;
+    font-family: var(--font-sans);
+  }
+
+  .btn-submit:hover:not(:disabled) {
+    background: var(--color-accent-soft);
+  }
+
+  .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  .btn-submit:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .btn-loader {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 700ms linear infinite;
+    display: none;
+  }
+
+  .lead-form.is-loading .btn-loader {
+    display: inline-block;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .form-note {
+    font-size: 0.8125rem;
+    color: var(--color-mute);
+    margin: 0;
+  }
+
+  .variant-dark .form-note {
+    color: var(--color-mute-light);
+  }
+
+  /* Status */
+  .form-status {
+    padding: 1rem 1.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    border-left: 3px solid var(--color-accent);
+    background: rgba(91, 143, 185, 0.1);
+    color: var(--color-ink);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .form-status .status-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .form-status strong {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    font-family: var(--font-display);
+    letter-spacing: 0.005em;
+  }
+
+  .variant-dark .form-status {
+    background: rgba(91, 143, 185, 0.12);
+    color: var(--color-paper);
+  }
+
+  .form-status.is-error {
+    border-left-color: #B23A48;
+    background: rgba(178, 58, 72, 0.12);
+    color: #B23A48;
+  }
+
+  .variant-dark .form-status.is-error {
+    color: #FFB4B4;
+    background: rgba(178, 58, 72, 0.15);
+  }
+
+  .form-status.is-success {
+    border-left-color: #4A9D6C;
+    background: rgba(74, 157, 108, 0.14);
+    color: #2A6E48;
+  }
+
+  .variant-dark .form-status.is-success {
+    color: #BAE2C9;
+    background: rgba(74, 157, 108, 0.18);
+  }
+
+  .form-status a {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  /* Compact (для встраивания в небольшие колонки) */
+  .is-compact .lead-form-title {
+    font-size: 1.25rem;
+  }
+
+  .is-compact .lead-form-subtitle {
+    font-size: 0.9375rem;
+  }
+</style>

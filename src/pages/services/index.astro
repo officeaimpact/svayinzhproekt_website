@@ -1,0 +1,153 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HeroPage from '../../components/HeroPage.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Section from '../../components/Section.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import CTASection from '../../components/CTASection.astro';
+import { site } from '../../data/site';
+
+const servicesJsonLd = {
+  '@type': 'ItemList',
+  itemListElement: site.services.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: s.title,
+    url: new URL(`/services/${s.slug}/`, site.url).toString(),
+  })),
+};
+---
+
+<BaseLayout
+  title="Услуги по буровым и свайным работам"
+  description="Буровые сваи, шпунт и ограждения котлованов, струйная цементация и анкера, фундаментные работы под ключ. Технологии по СП 24.13330, СП 50-102-2003, ГОСТ 19804-2012."
+  jsonLd={servicesJsonLd}
+>
+  <HeroPage
+    eyebrow="Услуги"
+    title="Четыре направления буровых и свайных работ"
+    lead="Главный фокус — буровые сваи, которые формируют фундамент любой стройки. Сопутствующие фундаментные процессы закрываем сами или через партнёрскую группу компаний полного цикла."
+    imageSrc="/images/hero/services.jpg"
+  />
+
+  <Breadcrumbs items={[{ label: 'Услуги' }]} />
+
+  <Section>
+    <div class="services-list">
+      {site.services.map((s, idx) => (
+        <ServiceCard
+          slug={s.slug}
+          title={s.title}
+          tagline={s.tagline}
+          number={`0${idx + 1}`}
+        />
+      ))}
+    </div>
+  </Section>
+
+  <Section dark tight>
+    <p class="eyebrow">Технологии в одном списке</p>
+    <h2>Все виды свай и связанных процессов</h2>
+    <div class="tech-grid">
+      <div>
+        <h3>Сваи</h3>
+        <ul>
+          <li>Буронабивные сваи с обсадной трубой</li>
+          <li>Буронабивные сваи по технологии CFA</li>
+          <li>Буросекущие сваи (Ø380–1500 мм)</li>
+          <li>Буроинъекционные сваи</li>
+          <li>Винтовые буронабивные сваи</li>
+          <li>Забивные железобетонные сваи</li>
+          <li>Вдавливаемые сваи</li>
+          <li>Грунтоцементные сваи (jet-grouting)</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Ограждения и анкера</h3>
+        <ul>
+          <li>Шпунтовое ограждение — трубный шпунт</li>
+          <li>Шпунтовое ограждение — шпунт Ларсена</li>
+          <li>Стена в грунте</li>
+          <li>Ограждения котлованов чередующимися сваями</li>
+          <li>Земляные анкера</li>
+          <li>Грунтоцементные стены</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Фундаментные процессы</h3>
+        <ul>
+          <li>Свайные фундаменты под ключ</li>
+          <li>Монолитные ростверки</li>
+          <li>Подпорные стены и габионы</li>
+          <li>Лотки селевой защиты, берегоукрепление</li>
+          <li>Разработка котлованов</li>
+          <li>ППР, проектная и рабочая документация (через ООО «Промос»)</li>
+          <li>СМР и строительный контроль (через партнёров)</li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <CTASection />
+</BaseLayout>
+
+<style>
+  .services-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .services-list {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .tech-grid {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .tech-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .tech-grid h3 {
+    color: var(--color-accent);
+    font-size: 1.0625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--color-line-dark);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .tech-grid ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    color: var(--color-mute-light);
+    font-size: 0.9375rem;
+  }
+
+  .tech-grid li {
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .tech-grid li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 8px;
+    height: 1px;
+    background: var(--color-accent);
+  }
+</style>

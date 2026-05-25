@@ -1,0 +1,294 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HeroPage from '../../components/HeroPage.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Section from '../../components/Section.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CTASection from '../../components/CTASection.astro';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  return site.cases.map((c) => ({
+    params: { slug: c.slug },
+    props: { caseData: c },
+  }));
+}
+
+interface CaseData {
+  slug: string;
+  image?: string;
+  title: string;
+  shortTitle?: string;
+  location: string;
+  period?: string;
+  client?: string;
+  generalContractor?: string;
+  category: string;
+  summary: string;
+  workDone: string;
+  metrics: { label: string; value: string }[];
+  featured?: boolean;
+  current?: boolean;
+  stage?: string;
+}
+
+const { caseData } = Astro.props as { caseData: CaseData };
+const c = caseData;
+
+const heroImage = c.image ?? `/images/cases/${c.slug.split('-')[0]}.jpg`;
+
+const relatedCases = site.cases
+  .filter((rc) => rc.slug !== c.slug && rc.featured)
+  .slice(0, 3);
+
+const detailJsonLd = {
+  '@type': 'CreativeWork',
+  '@id': `${site.url}/cases/${c.slug}/#project`,
+  name: c.title,
+  description: c.summary,
+  creator: { '@id': `${site.url}/#organization` },
+  ...(c.client && { sourceOrganization: { '@type': 'Organization', name: c.client } }),
+  ...(c.location && { contentLocation: { '@type': 'Place', name: c.location } }),
+  ...(c.period && { dateCreated: c.period }),
+  about: c.workDone,
+  isPartOf: { '@id': `${site.url}/cases/` },
+};
+---
+
+<BaseLayout
+  title={`${c.shortTitle ?? c.title} — кейс`}
+  description={`${c.summary} ${c.workDone}`.slice(0, 220)}
+  type="article"
+  jsonLd={detailJsonLd}
+>
+  <HeroPage
+    eyebrow={c.category}
+    title={c.title}
+    lead={c.summary}
+    imageSrc={heroImage}
+  >
+    <ul class="hero-meta" role="list">
+      <li><span>Локация</span><strong>{c.location}</strong></li>
+      {c.period && <li><span>Период</span><strong>{c.period}</strong></li>}
+      {c.client && <li><span>Заказчик</span><strong>{c.client}</strong></li>}
+      {c.generalContractor && <li><span>Генподрядчик</span><strong>{c.generalContractor}</strong></li>}
+    </ul>
+  </HeroPage>
+
+  <Breadcrumbs
+    items={[
+      { label: 'Проекты', href: '/cases/' },
+      { label: c.shortTitle ?? c.title },
+    ]}
+  />
+
+  <Section>
+    <div class="case-grid">
+      <div class="case-main">
+        <p class="eyebrow">Наша часть работ</p>
+        <h2 class="case-h2">Что выполнила инженерная команда</h2>
+        <p class="case-body">{c.workDone}</p>
+
+        <div class="case-divider"></div>
+
+        <p class="eyebrow">Объект целиком</p>
+        <h2 class="case-h2">Контекст проекта</h2>
+        <p class="case-body">{c.summary}</p>
+
+      </div>
+
+      <aside class="case-side">
+        <h3>Технические параметры</h3>
+        <ul class="metrics-list">
+          {c.metrics.map((m) => (
+            <li>
+              <div class="metric-value">{m.value}</div>
+              <div class="metric-label">{m.label}</div>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </div>
+  </Section>
+
+  <Section dark tight>
+    <p class="eyebrow">Связанные кейсы</p>
+    <h2>Другие проекты команды</h2>
+    <div class="related-cases">
+      {relatedCases.map((rc: any) => (
+        <CaseCard
+          slug={rc.slug}
+          title={rc.title}
+          shortTitle={rc.shortTitle}
+          location={rc.location}
+          period={rc.period}
+          category={rc.category}
+          summary={rc.summary}
+          imageSrc={rc.image ?? `/images/cases/${rc.slug.split('-')[0]}.jpg`}
+          current={rc.current ?? false}
+        />
+      ))}
+    </div>
+  </Section>
+
+  <CTASection />
+</BaseLayout>
+
+<style>
+  .hero-meta {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .hero-meta {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-meta {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .hero-meta li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .hero-meta span {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: var(--color-accent-2);
+  }
+
+  .hero-meta strong {
+    color: var(--color-paper);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .case-grid {
+    display: grid;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  @media (min-width: 1024px) {
+    .case-grid {
+      grid-template-columns: 1.6fr 1fr;
+      gap: 4rem;
+    }
+  }
+
+  .case-h2 {
+    margin: 0.75rem 0 1rem;
+    font-size: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .case-h2 {
+      font-size: 1.875rem;
+    }
+  }
+
+  .case-body {
+    color: var(--color-ink-2);
+    line-height: 1.7;
+    font-size: 1.0625rem;
+    margin: 0;
+  }
+
+  .case-divider {
+    height: 1px;
+    background: var(--color-line);
+    margin: 3rem 0;
+  }
+
+  .case-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .case-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-line);
+    color: var(--color-ink-2);
+    line-height: 1.55;
+  }
+
+  .case-list li:last-child {
+    border-bottom: none;
+  }
+
+  .case-side {
+    background: var(--color-paper-2);
+    padding: 2rem;
+    position: sticky;
+    top: 100px;
+  }
+
+  .case-side h3 {
+    font-size: 1.0625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-mute);
+    border-bottom: 1px solid var(--color-line);
+    padding-bottom: 1rem;
+    margin: 0 0 1.5rem;
+  }
+
+  .metrics-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .metric-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.625rem;
+    color: var(--color-ink);
+    line-height: 1.1;
+  }
+
+  .metric-label {
+    color: var(--color-mute);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.25rem;
+  }
+
+  .related-cases {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .related-cases {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .related-cases {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+</style>

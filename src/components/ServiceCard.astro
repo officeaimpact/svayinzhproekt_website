@@ -1,0 +1,74 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  tagline: string;
+  number: string;
+}
+
+const { slug, title, tagline, number } = Astro.props;
+---
+
+<a class="service-card" href={`/services/${slug}/`}>
+  <span class="service-num">{number}</span>
+  <div class="service-body">
+    <h3>{title}</h3>
+    <p>{tagline}</p>
+    <span class="service-link">Перейти к описанию →</span>
+  </div>
+</a>
+
+<style>
+  .service-card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.75rem;
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+    transition: background 200ms ease-out;
+    border-left: 3px solid transparent;
+  }
+
+  .service-card:hover {
+    background: #fff;
+    border-left-color: var(--color-accent);
+  }
+
+  .service-num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--color-accent);
+    line-height: 1.4;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    padding-top: 0.125rem;
+  }
+
+  .service-body {
+    flex: 1;
+  }
+
+  .service-body h3 {
+    font-size: 1.25rem;
+    margin: 0 0 0.5rem;
+  }
+
+  .service-body p {
+    color: var(--color-ink-2);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .service-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .service-card:hover .service-link {
+    color: var(--color-accent);
+  }
+</style>

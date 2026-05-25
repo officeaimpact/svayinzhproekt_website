@@ -1,0 +1,31 @@
+---
+interface Props {
+  dark?: boolean;
+  tight?: boolean;
+  id?: string;
+  class?: string;
+  background?: 'default' | 'alt';
+}
+
+const { dark = false, tight = false, id, class: extraClass = '', background = 'default' } = Astro.props;
+const classes = [
+  tight ? 'section-tight' : 'section',
+  dark ? 'section-dark' : '',
+  background === 'alt' ? 'section-alt' : '',
+  extraClass,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<section id={id} class={classes}>
+  <div class="container-page">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section-alt {
+    background: var(--color-paper-2);
+  }
+</style>

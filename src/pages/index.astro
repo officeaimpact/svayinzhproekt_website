@@ -1,0 +1,612 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import CaseCard from '../components/CaseCard.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import PartnersStrip from '../components/PartnersStrip.astro';
+import CTASection from '../components/CTASection.astro';
+import { site } from '../data/site';
+
+const featuredCases = site.cases.filter((c) => c.featured);
+const current = site.cases.find((c) => c.current);
+
+const homeJsonLd = [
+  {
+    '@type': 'ProfessionalService',
+    '@id': `${site.url}/#professional`,
+    name: site.brand,
+    description: site.description,
+    parentOrganization: { '@id': `${site.url}/#organization` },
+    areaServed: { '@type': 'Country', name: 'Россия' },
+    serviceType: 'Буровые и свайные работы',
+    knowsAbout: [
+      'Буронабивные сваи',
+      'Буросекущие сваи',
+      'CFA',
+      'Jet-grouting',
+      'Земляные анкера',
+      'Шпунтовое ограждение',
+      'Свайные фундаменты',
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="СвайИнжПроект — специализированный подрядчик по сваям"
+  description="Буровые и свайные работы для инфраструктурного и промышленного строительства. Опыт команды с 1998 года: М-12 Дюртюли–Ачит, Дублёр Курортного проспекта в Сочи, трамплины «Русские горки», ТЭЦ-20, ЗИЛ. Собственный парк из 7 буровых установок Casagrande и Bauer."
+  jsonLd={homeJsonLd}
+>
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <img src="/images/hero/main.jpg" alt="" class="photo-bw" loading="eager" decoding="async" />
+      <div class="hero-bg-overlay"></div>
+    </div>
+    <div class="container-page hero-content">
+      <div class="hero-top">
+        <p class="eyebrow hero-eyebrow">{site.tagline}</p>
+        <h1 class="hero-h1">
+          Буровые и свайные работы для инфраструктурного и промышленного строительства
+        </h1>
+        <p class="hero-lead">
+          Сваи — первый и самый ответственный этап стройки. Работаем там, где другие подрядчики не готовы рисковать сроком и качеством: сложные грунты, плотная городская застройка, объекты Автодора и Россети.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/services/">Все услуги</a>
+          <a class="btn btn-ghost-light" href="/cases/">Реализованные проекты</a>
+        </div>
+      </div>
+
+      <ul class="hero-stats" role="list">
+        <li>
+          <div class="stat-value">1998</div>
+          <div class="stat-label">Год начала опыта команды</div>
+        </li>
+        <li>
+          <div class="stat-value">20+</div>
+          <div class="stat-label">Инфраструктурных объектов</div>
+        </li>
+        <li>
+          <div class="stat-value">7</div>
+          <div class="stat-label">Буровых установок в парке</div>
+        </li>
+        <li>
+          <div class="stat-value">РФ</div>
+          <div class="stat-label">Работаем по всей стране</div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {current && (
+    <Section tight class="current-project">
+      <div class="current-card">
+        <div class="current-card-info">
+          <p class="eyebrow current-eyebrow">Текущий объект</p>
+          <h2 class="current-card-title">
+            Реконструкция воздушной линии электропередачи 110 кВ в Москве
+          </h2>
+          <p class="current-card-text">
+            Устройство буронабивных свай под опоры реконструируемой ЛЭП в северо-западной части Москвы. Работаем в режиме субподряда. Четыре технологии свайных работ на двух площадках — буровые сваи, шпунт обсадной трубой, ЦФА и буросекущие сваи.
+          </p>
+          <a class="btn btn-outline" href={`/cases/${current.slug}/`}>Подробнее о проекте</a>
+        </div>
+        <div class="current-card-stats">
+          {current.metrics.filter((m) => m.label !== 'Статус').map((m) => (
+            <div>
+              <div class="stat-value" style="color: var(--color-ink);">{m.value}</div>
+              <div class="stat-label">{m.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Section>
+  )}
+
+  <Section>
+    <p class="eyebrow">Услуги</p>
+    <h2>Четыре направления буровых и свайных работ</h2>
+    <p class="section-lead">
+      Главный фокус — буровые сваи. Сопутствующие фундаментные процессы закрываем сами или через партнёров полного цикла.
+    </p>
+    <div class="services-grid">
+      {site.services.map((s, idx) => (
+        <ServiceCard
+          slug={s.slug}
+          title={s.title}
+          tagline={s.tagline}
+          number={`0${idx + 1}`}
+        />
+      ))}
+    </div>
+  </Section>
+
+  <Section dark>
+    <p class="eyebrow">Опыт команды</p>
+    <h2>Объекты, на которых работала наша инженерная команда</h2>
+    <p class="section-lead" style="color: var(--color-mute-light);">
+      Команда выполняет буровые и свайные работы на инфраструктурных объектах с 1998 года. Ниже — публикуемые проекты.
+    </p>
+    <div class="experience-grid">
+      <div>
+        <h3>Сочи и Краснодарский край</h3>
+        <ul class="experience-list">
+          <li>Кепшинский тоннель, 1998–2004</li>
+          <li>Обход г. Сочи, 2003–2009: 5 тоннелей и 6 мостов</li>
+          <li>Газопровод Россия — Турция — Краснодарский край, 2007</li>
+          <li>Дублёр Курортного проспекта, 2009–2013</li>
+          <li>Этнокомплекс «Моя Россия», Роза Хутор</li>
+          <li>Комплекс трамплинов «Русские горки» К-125 / К-95</li>
+          <li>Спортивно-туристический комплекс «Горки Город»</li>
+          <li>Реконструкция вокзала «Адлер»</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Москва и Московская область</h3>
+        <ul class="experience-list">
+          <li>ТЭЦ-20, ул. Вавилова, 13</li>
+          <li>Завод ЗИЛ</li>
+          <li>Стадион «Локомотив», 2000–2002</li>
+          <li>Транспортная развязка МКАД × Ленинский проспект</li>
+          <li>Северо-Восточная хорда (Измайловское — Щёлковское шоссе)</li>
+          <li>Калининско-Солнцевская линия метро («Раменки» — «Рассказовка»)</li>
+          <li>ПС 110 кВ «Берсеневская»</li>
+          <li>Реконструкция ЛЭП 110 кВ в Москве</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Башкортостан, Татарстан, Урал, Кавказ</h3>
+        <ul class="experience-list">
+          <li>М-12 «Москва — Казань», Дюртюли — Ачит, 2021–2023</li>
+          <li>Две станции метро в Казани, 2002–2004</li>
+          <li>М-29 «Кавказ», Республика Ингушетия, 2014–2015</li>
+          <li>Верхнетагильская ГРЭС, Свердловская область</li>
+          <li>Реконструкция аэропортов Екатеринбурга, Магаса, Владикавказа, Мурманска, Воронежа, 2011–2015</li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="cases">
+    <div class="cases-header">
+      <div>
+        <p class="eyebrow">Реализованные проекты</p>
+        <h2>Флагманские кейсы команды</h2>
+        <p class="section-lead">
+          На каждом проекте отдельно указано, какие именно работы выполняла наша инженерная команда — только буровая и свайная часть.
+        </p>
+      </div>
+      <a class="btn btn-outline" href="/cases/">Все проекты</a>
+    </div>
+
+    <div class="cases-grid">
+      {featuredCases.map((c) => (
+        <CaseCard
+          slug={c.slug}
+          title={c.title}
+          shortTitle={c.shortTitle}
+          location={c.location}
+          period={c.period}
+          category={c.category}
+          summary={c.summary}
+          imageSrc={(c as any).image ?? `/images/cases/${c.slug.split('-')[0]}.jpg`}
+          current={c.current ?? false}
+        />
+      ))}
+    </div>
+  </Section>
+
+  <Section dark id="equipment">
+    <div class="equipment-grid">
+      <div>
+        <p class="eyebrow">Техника и база</p>
+        <h2>Собственный парк из 7 буровых установок</h2>
+        <p class="section-lead" style="color: var(--color-mute-light);">
+          Casagrande B300, Casagrande B250 XP, Bauer BG-15, BG-28 и BG-36 на балансе ИП. Краны 25 и 50 тонн, экскаваторы JCB и Caterpillar 323DL. Производственная база в Москве, район Зорге.
+        </p>
+        <a class="btn btn-outline" href="/equipment/">Перейти к технике</a>
+      </div>
+      <ul class="equipment-list" role="list">
+        {site.equipment.drillingRigs.map((rig) => (
+          <li>
+            <span class="eq-name">{rig.model}</span>
+            <span class="eq-count">{rig.count} {rig.count === 1 ? 'ед.' : 'ед.'}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Section>
+
+  <Section background="alt">
+    <PartnersStrip
+      variant="trust"
+      heading="Кто уже доверяет команде"
+      caption="Заказчики, генеральные подрядчики и государственные структуры, для которых мы выполняли буровые и свайные работы. Порядок отражает значимость и роль в текущих проектах."
+    />
+  </Section>
+
+  <Section>
+    <PartnersStrip
+      variant="partners"
+      heading="Партнёрская группа компаний полного цикла"
+      caption="Когда заказчик хочет получить под один договор полный комплекс — от проектирования до отделки — мы выходим вместе с проверенными партнёрами. Каждая компания закрывает свою специализацию."
+    />
+  </Section>
+
+  <CTASection />
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    background: var(--color-bg);
+    color: var(--color-paper);
+    overflow: hidden;
+    padding-block: 3rem 2.5rem;
+    display: flex;
+    align-items: stretch;
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      min-height: calc(100svh - var(--header-h, 76px));
+      padding-block: 3rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .hero {
+      padding-block: 4rem 3rem;
+    }
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.3;
+  }
+
+  .hero-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 27, 44, 0.65) 0%, rgba(11, 27, 44, 0.95) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-content {
+      justify-content: space-between;
+      gap: 2.5rem;
+    }
+  }
+
+  .hero-top {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-top {
+      margin-top: auto;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .hero-eyebrow {
+    color: var(--color-accent-2);
+  }
+
+  .hero-h1 {
+    margin: 0.75rem 0 1rem;
+    color: var(--color-paper);
+    font-size: 1.875rem;
+    line-height: 1.15;
+  }
+
+  @media (min-width: 768px) {
+    .hero-h1 {
+      font-size: 2.25rem;
+      line-height: 1.12;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-h1 {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .hero-h1 {
+      font-size: 2.875rem;
+      line-height: 1.1;
+    }
+  }
+
+  .hero-lead {
+    color: var(--color-mute-light);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 60ch;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-lead {
+      font-size: 1.0625rem;
+      margin-bottom: 1.75rem;
+    }
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+    margin-bottom: 1.75rem;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-actions {
+      margin-bottom: 0;
+    }
+  }
+
+  .hero-stats {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 2rem;
+    border-top: 1px solid var(--color-line-dark);
+    padding-top: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-stats {
+      grid-template-columns: repeat(4, 1fr);
+      padding-top: 1.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-stats {
+      margin-top: auto;
+    }
+  }
+
+  .hero-stats .stat-value {
+    font-size: 1.875rem;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-stats .stat-value {
+      font-size: 2.25rem;
+    }
+  }
+
+  .hero-stats .stat-value {
+    color: var(--color-accent-2);
+  }
+
+  .hero-stats .stat-label {
+    color: var(--color-mute-light);
+  }
+
+  .section-lead {
+    color: var(--color-mute);
+    max-width: 60ch;
+    line-height: 1.6;
+    margin-top: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .current-project {
+    background: var(--color-paper-2);
+  }
+
+  .current-card {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  @media (min-width: 1024px) {
+    .current-card {
+      grid-template-columns: 1.4fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  .current-eyebrow {
+    color: var(--color-accent);
+  }
+
+  .current-card-title {
+    margin-top: 0.75rem;
+    font-size: 1.5rem;
+    line-height: 1.25;
+    color: var(--color-ink);
+  }
+
+  @media (min-width: 768px) {
+    .current-card-title {
+      font-size: 1.875rem;
+    }
+  }
+
+  .current-card-text {
+    color: var(--color-ink-2);
+    max-width: 56ch;
+    margin-block: 1rem 1.5rem;
+    line-height: 1.65;
+  }
+
+  .current-card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2rem;
+    padding: 2rem;
+    background: white;
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .services-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .experience-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .experience-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
+  }
+
+  .experience-grid h3 {
+    font-size: 1.0625rem;
+    color: var(--color-accent-2);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-line-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .experience-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    color: var(--color-mute-light);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .experience-list li {
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .experience-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6rem;
+    width: 8px;
+    height: 1px;
+    background: var(--color-accent);
+  }
+
+  .cases-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .cases-header {
+      flex-direction: row;
+      align-items: flex-end;
+    }
+  }
+
+  .cases-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .cases-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cases-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .equipment-grid {
+    display: grid;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  @media (min-width: 1024px) {
+    .equipment-grid {
+      grid-template-columns: 1.2fr 1fr;
+    }
+  }
+
+  .equipment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--color-line-dark);
+  }
+
+  .equipment-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-line-dark);
+    color: var(--color-paper);
+    font-size: 0.9375rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .eq-name {
+    color: var(--color-paper);
+    font-weight: 500;
+  }
+
+  .eq-count {
+    color: var(--color-accent-2);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+</style>

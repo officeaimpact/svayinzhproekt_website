@@ -1,0 +1,92 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  imageSrc?: string;
+  imageAlt?: string;
+}
+
+const { eyebrow, title, lead, imageSrc, imageAlt = '' } = Astro.props;
+---
+
+<section class="hero-page" data-has-image={imageSrc ? 'true' : 'false'}>
+  {
+    imageSrc && (
+      <div class="hero-bg" aria-hidden="true">
+        <img src={imageSrc} alt="" class="photo-bw" loading="eager" decoding="async" />
+        <div class="hero-overlay" />
+      </div>
+    )
+  }
+  <div class="container-page hero-inner">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {lead && <p class="hero-lead">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .hero-page {
+    background: var(--color-bg);
+    color: var(--color-paper);
+    position: relative;
+    overflow: hidden;
+    padding-block: 5rem 4rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-page {
+      padding-block: 7rem 5rem;
+    }
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.35;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(11, 27, 44, 0.7) 0%, rgba(11, 27, 44, 0.92) 100%);
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+  }
+
+  .hero-page :global(h1) {
+    color: var(--color-paper);
+    margin-block: 0.75rem 1.25rem;
+  }
+
+  .hero-lead {
+    color: var(--color-mute-light);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    max-width: 56ch;
+  }
+
+  @media (min-width: 768px) {
+    .hero-lead {
+      font-size: 1.1875rem;
+    }
+  }
+
+  .hero-page :global(.eyebrow) {
+    color: var(--color-accent-2);
+  }
+</style>

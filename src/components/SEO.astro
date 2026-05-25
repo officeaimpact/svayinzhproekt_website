@@ -1,0 +1,269 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  path?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  jsonLd?: Record<string, any> | Record<string, any>[];
+  datePublished?: string;
+  dateModified?: string;
+}
+
+const {
+  title,
+  description = site.description,
+  path = Astro.url.pathname,
+  image = '/images/og-default.svg',
+  type = 'website',
+  noindex = false,
+  jsonLd,
+  datePublished,
+  dateModified,
+} = Astro.props;
+
+const canonical = new URL(path, site.url).toString();
+const fullTitle = path === '/' ? title : `${title} — ${site.brand}`;
+const imageUrl = new URL(image, site.url).toString();
+
+const today = new Date().toISOString().slice(0, 10);
+const effectiveModified = dateModified ?? today;
+
+const baseOrganization = {
+  '@type': ['Organization', 'LocalBusiness', 'GeneralContractor'],
+  '@id': `${site.url}/#organization`,
+  name: site.brand,
+  alternateName: ['СвайИнжПроект', 'Свай Инж Проект', 'SvayInzhProekt'],
+  legalName: site.legalName,
+  url: site.url,
+  description: site.description,
+  taxID: site.legal.inn,
+  vatID: site.legal.inn,
+  telephone: site.contacts.phone,
+  email: site.contacts.email,
+  image: new URL('/images/og-default.svg', site.url).toString(),
+  logo: new URL('/images/logo-mark.png', site.url).toString(),
+  priceRange: '₽₽₽',
+  foundingDate: '2025',
+  slogan: site.tagline,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'ул. Красноармейская, д. 12, кв. 67',
+    addressLocality: 'Сочи',
+    addressRegion: 'Краснодарский край',
+    postalCode: '354065',
+    addressCountry: 'RU',
+  },
+  contactPoint: [
+    {
+      '@type': 'ContactPoint',
+      telephone: site.contacts.phone,
+      email: site.contacts.email,
+      contactType: 'sales',
+      areaServed: 'RU',
+      availableLanguage: ['Russian'],
+    },
+  ],
+  areaServed: [
+    { '@type': 'Country', name: 'Россия' },
+    { '@type': 'AdministrativeArea', name: 'Москва' },
+    { '@type': 'AdministrativeArea', name: 'Московская область' },
+    { '@type': 'AdministrativeArea', name: 'Краснодарский край' },
+    { '@type': 'City', name: 'Сочи' },
+    { '@type': 'AdministrativeArea', name: 'Республика Башкортостан' },
+    { '@type': 'AdministrativeArea', name: 'Свердловская область' },
+  ],
+  knowsAbout: [
+    'Буровые сваи',
+    'Буронабивные сваи',
+    'Буросекущие сваи',
+    'CFA-сваи',
+    'Сваи с обсадной трубой',
+    'Буроинъекционные сваи',
+    'Винтовые сваи',
+    'Забивные железобетонные сваи',
+    'Вдавливаемые сваи',
+    'Jet-grouting',
+    'Струйная цементация грунта',
+    'Шпунтовое ограждение',
+    'Шпунт Ларсена',
+    'Трубный шпунт',
+    'Стена в грунте',
+    'Земляные анкера',
+    'Свайные фундаменты',
+    'Ограждение котлованов',
+    'Casagrande B300',
+    'Casagrande B250 XP',
+    'Bauer BG-15',
+    'Bauer BG-28',
+    'Bauer BG-36',
+    'Свайные работы в Москве',
+    'Свайные работы в Краснодарском крае',
+    'Субподряд по 44-ФЗ',
+    'Субподряд по 223-ФЗ',
+  ],
+  makesOffer: [
+    {
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: 'Устройство буронабивных свай',
+        serviceType: 'Свайные работы',
+      },
+    },
+    {
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: 'Шпунтовое ограждение котлованов',
+        serviceType: 'Свайные работы',
+      },
+    },
+    {
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: 'Струйная цементация и земляные анкера',
+        serviceType: 'Геотехнические работы',
+      },
+    },
+    {
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: 'Свайные фундаменты под ключ',
+        serviceType: 'Фундаментные работы',
+      },
+    },
+  ],
+};
+
+const websiteSchema = {
+  '@type': 'WebSite',
+  '@id': `${site.url}/#website`,
+  url: site.url,
+  name: site.brand,
+  description: site.description,
+  inLanguage: 'ru-RU',
+  publisher: { '@id': `${site.url}/#organization` },
+};
+
+const breadcrumbSegments = path
+  .split('/')
+  .filter(Boolean);
+
+const breadcrumbList =
+  breadcrumbSegments.length > 0
+    ? {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Главная',
+            item: site.url,
+          },
+          ...breadcrumbSegments.map((seg, idx) => ({
+            '@type': 'ListItem',
+            position: idx + 2,
+            name: seg
+              .replace(/-/g, ' ')
+              .replace(/^\w/, (c) => c.toUpperCase()),
+            item: new URL(
+              '/' + breadcrumbSegments.slice(0, idx + 1).join('/') + '/',
+              site.url,
+            ).toString(),
+          })),
+        ],
+      }
+    : null;
+
+const graph: Record<string, any>[] = [
+  baseOrganization,
+  websiteSchema,
+];
+
+if (breadcrumbList) graph.push(breadcrumbList);
+
+if (jsonLd) {
+  const items = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
+  graph.push(...items);
+}
+
+const schemaPayload = {
+  '@context': 'https://schema.org',
+  '@graph': graph,
+};
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<meta name="generator" content="Astro" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0B1B2C" />
+<meta name="color-scheme" content="light dark" />
+
+<link rel="canonical" href={canonical} />
+
+{
+  noindex ? (
+    <meta name="robots" content="noindex, nofollow" />
+  ) : (
+    <meta
+      name="robots"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+  )
+}
+
+<meta name="author" content={site.brand} />
+<meta name="geo.region" content="RU-MOW" />
+<meta name="geo.placename" content="Москва" />
+<meta name="ICBM" content="55.7558, 37.6173" />
+<meta name="format-detection" content="telephone=yes" />
+
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="ru_RU" />
+<meta property="og:site_name" content={site.brand} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+
+{datePublished && <meta property="article:published_time" content={datePublished} />}
+<meta property="article:modified_time" content={effectiveModified} />
+
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+<link rel="alternate" type="application/rss+xml" title={`${site.brand} — Журнал`} href="/journal/rss.xml" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="preload"
+  as="style"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+/>
+
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(schemaPayload)}
+/>

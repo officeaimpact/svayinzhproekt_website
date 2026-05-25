@@ -1,0 +1,156 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  shortTitle?: string;
+  location: string;
+  period?: string;
+  category: string;
+  summary: string;
+  imageSrc: string;
+  current?: boolean;
+}
+
+const {
+  slug,
+  title,
+  shortTitle,
+  location,
+  period,
+  category,
+  summary,
+  imageSrc,
+  current = false,
+} = Astro.props;
+---
+
+<a class="case-card" href={`/cases/${slug}/`} data-current={current ? 'true' : 'false'}>
+  <div class="case-card-media">
+    <img src={imageSrc} alt={title} loading="lazy" decoding="async" class="photo-bw" />
+    {current && <span class="badge-current">Текущий объект</span>}
+  </div>
+  <div class="case-card-body">
+    <p class="case-card-eyebrow">{category}</p>
+    <h3 class="case-card-title">{shortTitle ?? title}</h3>
+    <p class="case-card-meta">
+      <span>{location}</span>
+      {period && <><span class="dot" aria-hidden="true">·</span><span>{period}</span></>}
+    </p>
+    <p class="case-card-summary">{summary}</p>
+    <span class="case-card-link">Подробнее о проекте →</span>
+  </div>
+</a>
+
+<style>
+  .case-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-top-color 200ms ease-out;
+    border-top: 3px solid var(--color-line);
+    box-shadow: 0 1px 0 rgba(15, 34, 54, 0.04);
+  }
+
+  .case-card:hover {
+    border-top-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -16px rgba(11, 27, 44, 0.18);
+  }
+
+  .case-card[data-current='true'] {
+    border-top-color: var(--color-accent);
+  }
+
+  .case-card-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--color-bg);
+  }
+
+  .case-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 400ms ease-out;
+  }
+
+  .case-card:hover .case-card-media img {
+    transform: scale(1.03);
+  }
+
+  .badge-current {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(11, 27, 44, 0.85);
+    color: var(--color-paper);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: 0.4rem 0.75rem;
+    border-left: 2px solid var(--color-accent);
+    backdrop-filter: blur(4px);
+  }
+
+  .case-card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .case-card-eyebrow {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .case-card-title {
+    font-size: 1.1875rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.25;
+    color: var(--color-ink);
+  }
+
+  .case-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-mute);
+    margin: 0.25rem 0 0;
+  }
+
+  .dot {
+    color: var(--color-mute-light);
+  }
+
+  .case-card-summary {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-ink-2);
+    margin: 0.5rem 0 1rem;
+    flex: 1;
+  }
+
+  .case-card-link {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    letter-spacing: 0.01em;
+    transition: color 150ms ease-out;
+  }
+
+  .case-card:hover .case-card-link {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,0 +1,235 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HeroPage from '../../components/HeroPage.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Section from '../../components/Section.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CTASection from '../../components/CTASection.astro';
+import { site } from '../../data/site';
+
+const featured = site.cases.filter((c) => c.featured);
+const currentCase = featured.find((c) => c.current);
+const otherFeatured = featured.filter((c) => !c.current);
+
+const jsonLd = {
+  '@type': 'CollectionPage',
+  name: 'Реализованные проекты',
+  about: 'Буровые и свайные работы на инфраструктурных и промышленных объектах',
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: featured.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: new URL(`/cases/${c.slug}/`, site.url).toString(),
+      name: c.title,
+    })),
+  },
+};
+---
+
+<BaseLayout
+  title="Реализованные проекты"
+  description="Семь флагманских кейсов и тринадцать дополнительных объектов инженерной команды: М-12 Дюртюли–Ачит, Дублёр Курортного проспекта, трамплины «Русские горки», МКАД × Ленинский, ТЭЦ-20, ЗИЛ, метро. Текущий проект — реконструкция ЛЭП 110 кВ в Москве."
+  jsonLd={jsonLd}
+>
+  <HeroPage
+    eyebrow="Реализованные проекты"
+    title="Двадцать объектов опыта инженерной команды"
+    lead="На каждом проекте отдельно показано, какие именно работы выполняла наша команда — только буровая и свайная часть. Без преувеличений и без приписывания себе всего объекта."
+    imageSrc="/images/hero/cases.jpg"
+  />
+
+  <Breadcrumbs items={[{ label: 'Проекты' }]} />
+
+  {currentCase && (
+    <Section tight>
+      <p class="eyebrow" style="color: var(--color-accent);">Текущий объект</p>
+      <h2>Действующий проект</h2>
+      <div class="current-grid">
+        <CaseCard
+          slug={currentCase.slug}
+          title={currentCase.title}
+          shortTitle={currentCase.shortTitle}
+          location={currentCase.location}
+          period={currentCase.period}
+          category={currentCase.category}
+          summary={currentCase.summary}
+          imageSrc={(currentCase as any).image ?? `/images/cases/${currentCase.slug.split('-')[0]}.jpg`}
+          current
+        />
+        <div class="current-info">
+          <p>
+            Объект — реконструкция воздушной линии электропередачи 110 кВ в северо-западной части Москвы. Работаем в режиме субподряда.
+          </p>
+          <p>
+            Наша часть — специальные работы по бурению, опусканию арматурного каркаса и бетонированию через бетонолитную трубу. Сваи рассчитаны на нагрузки от металлоконструкций опор и провода ЛЭП.
+          </p>
+          <a href={`/cases/${currentCase.slug}/`} class="btn btn-outline">Подробности по кейсу</a>
+        </div>
+      </div>
+    </Section>
+  )}
+
+  <Section>
+    <p class="eyebrow">Флагманские кейсы</p>
+    <h2>Шесть реализованных объектов с фактическими параметрами</h2>
+    <p class="section-lead">
+      Эти проекты — концентрированный опыт команды по буровым и свайным работам в дорожно-мостовом, энергетическом и спортивно-туристическом строительстве.
+    </p>
+    <div class="cases-grid">
+      {otherFeatured.map((c) => (
+        <CaseCard
+          slug={c.slug}
+          title={c.title}
+          shortTitle={c.shortTitle}
+          location={c.location}
+          period={c.period}
+          category={c.category}
+          summary={c.summary}
+          imageSrc={(c as any).image ?? `/images/cases/${c.slug.split('-')[0]}.jpg`}
+        />
+      ))}
+    </div>
+  </Section>
+
+  <Section dark>
+    <p class="eyebrow">Опыт команды</p>
+    <h2>Дополнительные объекты</h2>
+    <p class="section-lead" style="color: var(--color-mute-light);">
+      Часть проектов — без отдельной страницы кейса, но с указанием буровой части работы команды.
+    </p>
+    <ul class="short-cases">
+      {site.shortCases.map((c) => (
+        <li>
+          <h3>{c.title}</h3>
+          <p class="meta">
+            <span>{c.location}</span>
+            {c.period && <><span class="dot" aria-hidden="true">·</span><span>{c.period}</span></>}
+          </p>
+          <p class="detail">{c.detail}</p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <CTASection
+    title="У вас есть проект свайного фундамента?"
+    text="Передайте геологические изыскания, проектную и рабочую документацию, ведомость свай. Мы оценим параметры площадки, сроки и подготовим коммерческое предложение."
+  />
+</BaseLayout>
+
+<style>
+  .current-grid {
+    display: grid;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .current-grid {
+      grid-template-columns: 1fr 1.2fr;
+      gap: 3rem;
+      align-items: start;
+    }
+  }
+
+  .current-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    color: var(--color-ink-2);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .current-info a {
+    margin-top: 1rem;
+    align-self: flex-start;
+  }
+
+  .section-lead {
+    color: var(--color-mute);
+    max-width: 60ch;
+    line-height: 1.6;
+    margin-top: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-dark .section-lead {
+    color: var(--color-mute-light);
+  }
+
+  .cases-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .cases-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cases-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .short-cases {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--color-line-dark);
+  }
+
+  @media (min-width: 768px) {
+    .short-cases {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .short-cases li {
+    padding: 1.75rem;
+    border-bottom: 1px solid var(--color-line-dark);
+  }
+
+  @media (min-width: 768px) {
+    .short-cases li:nth-child(2n) {
+      border-left: 1px solid var(--color-line-dark);
+    }
+  }
+
+  .short-cases h3 {
+    color: var(--color-paper);
+    font-size: 1.0625rem;
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+  }
+
+  .short-cases .meta {
+    color: var(--color-accent);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .short-cases .dot {
+    color: var(--color-mute);
+  }
+
+  .short-cases .detail {
+    color: var(--color-mute-light);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+</style>

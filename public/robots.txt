@@ -1,0 +1,74 @@
+# robots.txt для СвайИнжПроект (svayinzhproekt.ru)
+# Разрешаем индексацию всем основным поисковым и LLM-ботам.
+
+User-agent: *
+Allow: /
+
+# Поисковые системы
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+User-agent: Mail.Ru
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# LLM и AI-боты
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: FacebookExternalHit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+# Карты сайта
+Sitemap: https://svayinzhproekt.ru/sitemap-index.xml
+Sitemap: https://svayinzhproekt.ru/sitemap-0.xml

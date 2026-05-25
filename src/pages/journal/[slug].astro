@@ -1,0 +1,300 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Section from '../../components/Section.astro';
+import CTASection from '../../components/CTASection.astro';
+import { articles } from '../../data/journal';
+import { articleBodies } from '../../lib/article-bodies';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  return articles.map((a) => ({
+    params: { slug: a.slug },
+    props: { article: a },
+  }));
+}
+
+interface JournalArticle {
+  slug: string;
+  title: string;
+  subtitle: string;
+  category: string;
+  publishedAt: string;
+  updatedAt?: string;
+  readingMinutes: number;
+  heroImage: string;
+  intro: string;
+  keyAnswer: string;
+}
+
+const { article } = Astro.props as { article: JournalArticle };
+const body = articleBodies[article.slug] ?? '';
+
+const related = articles
+  .filter((a) => a.slug !== article.slug)
+  .filter((a) => a.category === article.category)
+  .slice(0, 3);
+
+const formatDate = (d: string) =>
+  new Date(d).toLocaleDateString('ru-RU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+const articleJsonLd = {
+  '@type': 'TechArticle',
+  '@id': `${site.url}/journal/${article.slug}/#article`,
+  headline: article.title,
+  description: article.intro,
+  image: new URL(article.heroImage, site.url).toString(),
+  datePublished: article.publishedAt,
+  dateModified: article.updatedAt ?? article.publishedAt,
+  author: { '@id': `${site.url}/#organization` },
+  publisher: { '@id': `${site.url}/#organization` },
+  inLanguage: 'ru-RU',
+  about: article.category,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.article-key-answer', '.article-intro'],
+  },
+};
+---
+
+<BaseLayout
+  title={article.title}
+  description={article.intro}
+  type="article"
+  image={article.heroImage}
+  datePublished={article.publishedAt}
+  dateModified={article.updatedAt ?? article.publishedAt}
+  jsonLd={articleJsonLd}
+>
+  <Breadcrumbs
+    items={[
+      { label: 'Журнал', href: '/journal/' },
+      { label: article.title },
+    ]}
+  />
+
+  <article class="article">
+    <div class="container-narrow">
+      <header class="article-header">
+        <p class="article-category">{article.category}</p>
+        <h1 class="article-title">{article.title}</h1>
+        <p class="article-subtitle">{article.subtitle}</p>
+        <div class="article-meta">
+          <span>Опубликовано {formatDate(article.publishedAt)}</span>
+          {article.updatedAt && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>Обновлено {formatDate(article.updatedAt)}</span>
+            </>
+          )}
+          <span aria-hidden="true">·</span>
+          <span>Чтение около {article.readingMinutes} мин</span>
+        </div>
+      </header>
+    </div>
+
+    <div class="container-page">
+      <div class="article-hero">
+        <img src={article.heroImage} alt={article.title} loading="eager" class="photo-bw" />
+      </div>
+    </div>
+
+    <div class="container-narrow">
+      <div class="article-intro">
+        <p>{article.intro}</p>
+      </div>
+
+      <aside class="article-key-answer">
+        <p class="key-label">Главное в одной фразе</p>
+        <p>{article.keyAnswer}</p>
+      </aside>
+
+      <div class="article-body prose-content" set:html={body}></div>
+
+      <footer class="article-footer">
+        <p>
+          Если у вас есть вопрос по теме статьи или вы хотите обсудить конкретный объект — свяжитесь с нашей инженерной командой через раздел{' '}
+          <a href="/contacts/">Контакты</a> или ознакомьтесь с{' '}
+          <a href="/cases/">реализованными проектами</a>.
+        </p>
+      </footer>
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <Section dark tight>
+      <p class="eyebrow">Связанные материалы</p>
+      <h2>Другие статьи по теме «{article.category}»</h2>
+      <ul class="related-list">
+        {related.map((r) => (
+          <li>
+            <a href={`/journal/${r.slug}/`}>
+              <h3>{r.title}</h3>
+              <p>{r.subtitle}</p>
+              <span>Читать →</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )}
+
+  <CTASection />
+</BaseLayout>
+
+<style>
+  .article {
+    padding-block: 3rem 5rem;
+  }
+
+  .article-header {
+    text-align: left;
+    padding-bottom: 2.5rem;
+  }
+
+  .article-category {
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+  }
+
+  .article-title {
+    margin: 0 0 1rem;
+    line-height: 1.15;
+  }
+
+  .article-subtitle {
+    color: var(--color-mute);
+    font-size: 1.125rem;
+    line-height: 1.5;
+    margin: 0 0 1.5rem;
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    color: var(--color-mute-light);
+    font-size: 0.875rem;
+  }
+
+  .article-hero {
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    margin-block: 2rem 3rem;
+  }
+
+  .article-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .article-intro p {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+    margin: 0 0 2rem;
+    font-weight: 500;
+  }
+
+  .article-key-answer {
+    background: var(--color-paper-2);
+    border-left: 3px solid var(--color-accent);
+    padding: 1.75rem 2rem;
+    margin: 0 0 2.5rem;
+  }
+
+  .key-label {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+    color: var(--color-mute);
+    margin: 0 0 0.5rem;
+    font-weight: 700;
+  }
+
+  .article-key-answer p:last-child {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+
+  .article-body {
+    font-size: 1.0625rem;
+  }
+
+  .article-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-line);
+    color: var(--color-mute);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .article-footer a {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 3px;
+  }
+
+  .related-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    .related-list {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .related-list a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: var(--color-surface);
+    color: var(--color-paper);
+    border-left: 3px solid var(--color-accent);
+    transition: background 200ms;
+  }
+
+  .related-list a:hover {
+    background: var(--color-surface-2);
+  }
+
+  .related-list h3 {
+    font-size: 1.0625rem;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .related-list p {
+    color: var(--color-mute-light);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+    flex: 1;
+  }
+
+  .related-list span {
+    color: var(--color-accent);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+</style>

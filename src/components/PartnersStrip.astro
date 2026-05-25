@@ -1,0 +1,299 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  variant?: 'trust' | 'partners';
+  heading?: string;
+  caption?: string;
+  dark?: boolean;
+}
+
+const {
+  variant = 'trust',
+  heading,
+  caption,
+  dark = false,
+} = Astro.props;
+
+const trustItems = site.trustedBy.map((t) => ({
+  name: t.name,
+  role: t.role,
+  detail: (t as any).detail ?? '',
+}));
+
+const partnerItems = site.partners.map((p) => ({
+  name: p.name,
+  role: p.role,
+  detail: (p as any).shortSummary ?? p.summary,
+  director: p.director,
+  slug: p.slug,
+}));
+
+const fallbackHeading =
+  variant === 'trust' ? 'Нам доверяют' : 'Партнёрская группа компаний';
+---
+
+<div class={`partners-strip variant-${variant} ${dark ? 'is-dark' : ''}`}>
+  <div class="partners-header">
+    <p class="eyebrow">{fallbackHeading}</p>
+    {heading && <h2>{heading}</h2>}
+    {caption && <p class="partners-caption">{caption}</p>}
+  </div>
+
+  {variant === 'trust' && (
+    <div class="trust-grid">
+      {trustItems.map((p, idx) => (
+        <article class="trust-card" data-rank={idx + 1}>
+          <div class="trust-rank">
+            <span class="rank-num">{String(idx + 1).padStart(2, '0')}</span>
+          </div>
+          <div class="trust-body">
+            <h3 class="trust-name">{p.name}</h3>
+            <p class="trust-role">{p.role}</p>
+            {p.detail && <p class="trust-detail">{p.detail}</p>}
+          </div>
+        </article>
+      ))}
+    </div>
+  )}
+
+  {variant === 'partners' && (
+    <div class="partners-grid">
+      {partnerItems.map((p) => (
+        <article class="partner-card">
+          <div class="partner-corner" aria-hidden="true"></div>
+          <h3 class="partner-name-h">{p.name}</h3>
+          <p class="partner-role-line">{p.role}</p>
+          <p class="partner-detail">{p.detail}</p>
+          <a class="partner-link" href={`/partners/#${p.slug}`}>
+            Подробнее
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </article>
+      ))}
+    </div>
+  )}
+</div>
+
+<style>
+  .partners-header {
+    margin-bottom: 2.5rem;
+    max-width: 720px;
+  }
+
+  .partners-header h2 {
+    margin: 0.5rem 0 1rem;
+  }
+
+  .partners-caption {
+    color: var(--color-mute);
+    line-height: 1.6;
+    font-size: 1.0625rem;
+  }
+
+  .is-dark .partners-caption {
+    color: var(--color-mute-light);
+  }
+
+  /* ====== TRUST VARIANT (заказчики и партнёры) ====== */
+
+  .trust-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .trust-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .trust-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .trust-card {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    padding: 1.5rem 1.25rem;
+    background: white;
+    border: 1px solid var(--color-line);
+    border-top: 3px solid var(--color-accent);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  }
+
+  .trust-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px -20px rgba(11, 27, 44, 0.25);
+  }
+
+  .trust-rank {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    background: var(--color-paper-2);
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+  }
+
+  .trust-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .trust-name {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 0.4rem;
+    color: var(--color-ink);
+    letter-spacing: 0.005em;
+  }
+
+  .trust-role {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+  }
+
+  .trust-detail {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-mute);
+    margin: 0;
+  }
+
+  /* ====== PARTNERS VARIANT (партнёрская группа полного цикла) ====== */
+
+  .partners-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .partners-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .partners-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .partner-card {
+    position: relative;
+    padding: 1.75rem;
+    background: var(--color-paper-2);
+    border: 1px solid var(--color-line);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: transform 200ms ease-out, background 200ms ease-out, border-color 200ms ease-out;
+    overflow: hidden;
+  }
+
+  .partner-card:hover {
+    background: white;
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .partner-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, transparent 50%, var(--color-accent) 50%);
+    opacity: 0.6;
+    transition: opacity 200ms ease-out;
+  }
+
+  .partner-card:hover .partner-corner {
+    opacity: 1;
+  }
+
+  .partner-name-h {
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+    color: var(--color-ink);
+    padding-right: 3rem;
+  }
+
+  .partner-role-line {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .partner-detail {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-ink-2);
+    margin: 0.25rem 0 0;
+    flex: 1;
+  }
+
+  .partner-meta {
+    font-size: 0.8125rem;
+    color: var(--color-mute);
+    margin: 0.5rem 0 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .partner-meta span {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.6875rem;
+    color: var(--color-mute-light);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .partner-link {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    transition: color 150ms ease-out;
+  }
+
+  .partner-link:hover {
+    color: var(--color-accent);
+  }
+
+  .partner-link .arrow {
+    transition: transform 200ms ease-out;
+  }
+
+  .partner-link:hover .arrow {
+    transform: translateX(4px);
+  }
+</style>

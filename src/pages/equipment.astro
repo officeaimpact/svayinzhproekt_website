@@ -1,0 +1,527 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroPage from '../components/HeroPage.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Section from '../components/Section.astro';
+import CTASection from '../components/CTASection.astro';
+import { site } from '../data/site';
+
+const totalRigs = site.equipment.drillingRigs.reduce((sum, r) => sum + r.count, 0);
+const totalSupport = site.equipment.support.reduce((sum, r) => sum + r.count, 0);
+
+const casagrande = site.equipment.drillingRigs.filter((r) => r.model.startsWith('Casagrande'));
+const bauer = site.equipment.drillingRigs.filter((r) => r.model.startsWith('Bauer'));
+
+// JSON-LD schema для парка техники — помогает LLM и поиску находить компанию по запросам типа «аренда Casagrande B300 в Москве»
+const equipmentJsonLd = [
+  ...site.equipment.drillingRigs.map((rig) => ({
+    '@type': 'Product',
+    '@id': `${site.url}/equipment/#${rig.model.toLowerCase().replace(/\s+/g, '-')}`,
+    name: rig.model,
+    category: 'Буровая установка',
+    brand: { '@type': 'Brand', name: rig.model.split(' ')[0] },
+    description: rig.role,
+    offers: {
+      '@type': 'Offer',
+      availability: 'https://schema.org/InStock',
+      seller: { '@id': `${site.url}/#organization` },
+      areaServed: { '@type': 'Country', name: 'Россия' },
+    },
+  })),
+  ...site.equipment.support.map((item) => ({
+    '@type': 'Product',
+    name: item.model,
+    category: 'Строительная и землеройная техника',
+    description: item.role,
+    offers: {
+      '@type': 'Offer',
+      availability: 'https://schema.org/InStock',
+      seller: { '@id': `${site.url}/#organization` },
+    },
+  })),
+];
+---
+
+<BaseLayout
+  title="Техника и производственная база — Casagrande B300, Bauer BG-36, JCB, Caterpillar"
+  description="Собственный парк буровых установок Casagrande B300 (3 ед.), Casagrande B250 XP, Bauer BG-15, Bauer BG-28, Bauer BG-36. Вспомогательная техника: экскаватор-погрузчик JCB, экскаватор Caterpillar 323DL, автомобильные краны 25 т и 50 т. Производственная база в Москве, район МЦК Зорге."
+  jsonLd={equipmentJsonLd}
+>
+  <HeroPage
+    eyebrow="Техника и база"
+    title="Собственный парк буровых установок и вспомогательной техники"
+    lead="Семь буровых установок Casagrande и Bauer на балансе. Краны 25 и 50 тонн, экскаваторы JCB и Caterpillar 323DL. Производственная база в Москве, район МЦК Зорге."
+    imageSrc="/images/hero/equipment.jpg"
+  />
+
+  <Breadcrumbs items={[{ label: 'Техника' }]} />
+
+  <Section>
+    <div class="overview-stats">
+      <div class="overview-item">
+        <div class="overview-num">{totalRigs}</div>
+        <div class="overview-cap">Буровых установок<br/>в собственном парке</div>
+      </div>
+      <div class="overview-item">
+        <div class="overview-num">{totalSupport}</div>
+        <div class="overview-cap">Единиц грузоподъёмной<br/>и землеройной техники</div>
+      </div>
+      <div class="overview-item">
+        <div class="overview-num">24/7</div>
+        <div class="overview-cap">Возможна работа<br/>в две смены</div>
+      </div>
+    </div>
+  </Section>
+
+  <Section>
+    <div class="rig-block">
+      <div class="rig-block-media">
+        <figure class="rig-photo">
+          <img
+            src="/images/equipment/casagrande-b300.jpg"
+            alt="Буровая установка Casagrande B300 на свайной площадке"
+            class="photo-bw"
+            loading="lazy"
+            decoding="async"
+            width="1280"
+            height="1920"
+          />
+          <figcaption class="rig-photo-caption">Casagrande B300 — основная буровая установка парка</figcaption>
+        </figure>
+      </div>
+
+      <div class="rig-block-body">
+        <p class="eyebrow">Буровые установки · Casagrande</p>
+        <h2 class="rig-block-title">Casagrande — итальянский эталон<br/>буровой техники</h2>
+        <p class="rig-block-lead">
+          Casagrande — мировой производитель буровых установок и фундаментной техники с 1960-х годов. На нашем балансе — четыре установки серии B: основная B300 в количестве трёх единиц и одна B250 XP. Установки обеспечивают весь спектр диаметров и глубин свайных работ.
+        </p>
+
+        <ul class="rig-list">
+          {casagrande.map((rig) => (
+            <li class="rig-list-item">
+              <div class="rig-list-head">
+                <h3 class="rig-list-model">{rig.model}</h3>
+                <span class="rig-list-count">
+                  <span class="count-num">{rig.count}</span>
+                  <span class="count-unit">ед.</span>
+                </span>
+              </div>
+              <p class="rig-list-role">{rig.role}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section background="alt">
+    <div class="rig-block">
+      <div class="rig-block-body">
+        <p class="eyebrow">Буровые установки · Bauer</p>
+        <h2 class="rig-block-title">Bauer — немецкая инженерия<br/>тяжёлого свайного бурения</h2>
+        <p class="rig-block-lead">
+          Bauer — лидер мирового рынка специальной фундаментной техники. На балансе — три установки серии BG разного класса: BG-15 для средних задач, универсальная BG-28 и тяжёлая BG-36 для свай большого диаметра и глубины.
+        </p>
+
+        <ul class="rig-list">
+          {bauer.map((rig) => (
+            <li class="rig-list-item">
+              <div class="rig-list-head">
+                <h3 class="rig-list-model">{rig.model}</h3>
+                <span class="rig-list-count">
+                  <span class="count-num">{rig.count}</span>
+                  <span class="count-unit">ед.</span>
+                </span>
+              </div>
+              <p class="rig-list-role">{rig.role}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="rig-block-media">
+        <figure class="rig-photo">
+          <img
+            src="/images/equipment/bauer-bg36.jpg"
+            alt="Тяжёлая буровая установка Bauer BG-36 на свайной площадке"
+            class="photo-bw"
+            loading="lazy"
+            decoding="async"
+            width="1024"
+            height="768"
+          />
+          <figcaption class="rig-photo-caption">Bauer BG-36 — тяжёлая буровая установка парка</figcaption>
+        </figure>
+      </div>
+    </div>
+  </Section>
+
+  <Section>
+    <div class="rig-block">
+      <div class="rig-block-media">
+        <figure class="rig-photo">
+          <img
+            src="/images/equipment/jcb-loader.jpg"
+            alt="Экскаватор-погрузчик JCB для общеплощадочных работ"
+            class="photo-bw"
+            loading="lazy"
+            decoding="async"
+            width="1280"
+            height="853"
+          />
+          <figcaption class="rig-photo-caption">Экскаватор-погрузчик JCB на производственной базе</figcaption>
+        </figure>
+      </div>
+
+      <div class="rig-block-body">
+        <p class="eyebrow">Вспомогательная техника</p>
+        <h2 class="rig-block-title">Краны и землеройные машины<br/>для свайной площадки</h2>
+        <p class="rig-block-lead">
+          Свайный объект — это не только буровая установка. Для подачи арматурных каркасов, разработки котлованов, зачистки оголовков и общеплощадочных работ — собственная грузоподъёмная и землеройная техника.
+        </p>
+
+        <ul class="rig-list">
+          {site.equipment.support.map((item) => (
+            <li class="rig-list-item">
+              <div class="rig-list-head">
+                <h3 class="rig-list-model">{item.model}</h3>
+                <span class="rig-list-count">
+                  <span class="count-num">{item.count}</span>
+                  <span class="count-unit">ед.</span>
+                </span>
+              </div>
+              <p class="rig-list-role">{item.role}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section background="alt">
+    <div class="section-head">
+      <p class="eyebrow">Оснастка</p>
+      <h2>Комплекты труб и инструмент</h2>
+      <p class="lead">
+        Под каждый объект — свой комплект обсадных и бетонолитных труб, центраторы, воронки, сварочное оборудование. Всё на собственной базе, без аренды и зависимости от сроков поставщиков.
+      </p>
+    </div>
+    <ul class="rigging-list">
+      {site.equipment.rigging.map((item) => <li>{item}</li>)}
+    </ul>
+  </Section>
+
+  <Section dark>
+    <p class="eyebrow">Производственная база</p>
+    <h2>Москва, район МЦК Зорге</h2>
+    <div class="base-grid">
+      <div>
+        <p class="base-text">
+          Главная производственная база СвайИнжПроект расположена в Москве, в районе станции МЦК Зорге. На территории — механический цех для подготовки и ремонта оборудования, склад обсадных и бетонолитных труб разных диаметров, склад воронок, центраторов и стандартной оснастки, сварочный пост.
+        </p>
+        <p class="base-text" style="color: var(--color-mute-light);">
+          Лаборатория и металлоконструкции — у партнёров. ООО «РСМ 40» закрывает монтаж металлоконструкций, сварочные работы и гидроизоляцию. ООО «Промос» сопровождает проектную часть и авторский надзор.
+        </p>
+      </div>
+      <ul class="base-list">
+        <li>
+          <strong>Механический цех</strong>
+          <span>Подготовка, ремонт и обслуживание буровой и вспомогательной техники.</span>
+        </li>
+        <li>
+          <strong>Склад обсадных труб</strong>
+          <span>Комплекты Ø 620, 800, 1000, 1200 мм под текущие и будущие объекты.</span>
+        </li>
+        <li>
+          <strong>Склад бетонолитных труб</strong>
+          <span>Стандартные диаметры 245, 325, 426 мм. Воронки и центраторы.</span>
+        </li>
+        <li>
+          <strong>Сварочный пост</strong>
+          <span>Подготовка арматурных каркасов, наращивание секций, ремонт оборудования.</span>
+        </li>
+      </ul>
+    </div>
+  </Section>
+
+  <CTASection />
+</BaseLayout>
+
+<style>
+  .section-head {
+    margin-bottom: 2.5rem;
+    max-width: 720px;
+  }
+
+  .section-head h2 {
+    margin: 0.5rem 0 1rem;
+  }
+
+  .section-head .lead {
+    color: var(--color-mute);
+    line-height: 1.65;
+    font-size: 1.0625rem;
+  }
+
+  .overview-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-block: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .overview-stats {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
+  }
+
+  .overview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--color-accent);
+  }
+
+  .overview-num {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .overview-cap {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-mute);
+    line-height: 1.4;
+  }
+
+  /* === BLOCKS WITH PHOTO + LIST === */
+  .rig-block {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    align-items: stretch;
+  }
+
+  @media (min-width: 1024px) {
+    .rig-block {
+      grid-template-columns: 1fr 1.1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+  }
+
+  .rig-block-media {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .rig-block-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .rig-block-title {
+    margin: 0.5rem 0 1rem;
+    font-size: 1.625rem;
+    line-height: 1.2;
+  }
+
+  @media (min-width: 768px) {
+    .rig-block-title {
+      font-size: 1.875rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .rig-block-title {
+      font-size: 2.25rem;
+    }
+  }
+
+  .rig-block-lead {
+    color: var(--color-mute);
+    line-height: 1.65;
+    max-width: 56ch;
+    margin-bottom: 2rem;
+  }
+
+  /* Photo treatment — чистое фото без подложки, полностью видимое */
+  .rig-photo {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+
+  .rig-photo img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    max-height: 540px;
+    object-fit: contain;
+  }
+
+  @media (min-width: 1024px) {
+    .rig-photo img {
+      max-height: 600px;
+    }
+  }
+
+  .rig-photo-caption {
+    margin-top: 1rem;
+    font-size: 0.8125rem;
+    color: var(--color-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  /* List of rigs */
+  .rig-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .rig-list-item {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--color-line);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .rig-list-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .rig-list-model {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-ink);
+  }
+
+  .rig-list-count {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    flex-shrink: 0;
+    padding: 0.375rem 0.75rem;
+    background: var(--color-bg);
+    color: var(--color-paper);
+    border-left: 2px solid var(--color-accent);
+    line-height: 1;
+  }
+
+  .rig-list-count .count-num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.375rem;
+    color: var(--color-paper);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .rig-list-count .count-unit {
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--color-accent-2);
+    text-transform: uppercase;
+  }
+
+  .rig-list-role {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-mute);
+    margin: 0;
+  }
+
+  /* Оснастка */
+  .rigging-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .rigging-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-line);
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .rigging-list li::before {
+    content: '— ';
+    color: var(--color-accent);
+    margin-right: 0.5rem;
+    font-weight: 600;
+  }
+
+  /* Production base */
+  .base-grid {
+    display: grid;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  @media (min-width: 1024px) {
+    .base-grid {
+      grid-template-columns: 1.4fr 1fr;
+      gap: 4rem;
+    }
+  }
+
+  .base-text {
+    color: var(--color-mute-light);
+    line-height: 1.65;
+    margin-block: 0 1rem;
+  }
+
+  .base-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--color-line-dark);
+  }
+
+  .base-list li {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--color-line-dark);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .base-list strong {
+    color: var(--color-paper);
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  .base-list span {
+    color: var(--color-mute-light);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+</style>

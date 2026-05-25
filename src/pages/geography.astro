@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroPage from '../components/HeroPage.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Section from '../components/Section.astro';
+import CTASection from '../components/CTASection.astro';
+
+const regions = [
+  {
+    title: 'Москва и Московская область',
+    activity: 'Активная база',
+    objects:
+      'Реконструкция ЛЭП 110 кВ для Россети (текущий), ТЭЦ-20, завод ЗИЛ, развязка МКАД × Ленинский проспект, Северо-Восточная хорда, Калининско-Солнцевская линия метро, ПС 110 кВ «Берсеневская», стадион «Локомотив».',
+  },
+  {
+    title: 'Краснодарский край',
+    activity: 'Активная база',
+    objects:
+      'Сочи: Кепшинский тоннель, обход Сочи (5 тоннелей и 6 мостов), Дублёр Курортного проспекта, этнокомплекс «Моя Россия», трамплины «Русские горки», «Горки Город», вокзал «Адлер», газопровод Россия — Турция.',
+  },
+  {
+    title: 'Республика Башкортостан',
+    activity: 'По проектам',
+    objects:
+      'М-12 «Москва — Казань», участок Дюртюли — Ачит. Этап 1.3.1, км 0 — км 90. Десять искусственных сооружений силами команды.',
+  },
+  {
+    title: 'Республика Татарстан',
+    activity: 'По проектам',
+    objects: 'Две станции метрополитена в Казани, 2002–2004.',
+  },
+  {
+    title: 'Республика Ингушетия',
+    activity: 'По проектам',
+    objects: 'М-29 «Кавказ», реконструкция автомобильной дороги, 2014–2015.',
+  },
+  {
+    title: 'Свердловская область',
+    activity: 'По проектам',
+    objects: 'Верхнетагильская ГРЭС — буронабивные сваи под объекты энергогенерации.',
+  },
+  {
+    title: 'Аэропортовые объекты',
+    activity: 'По проектам',
+    objects:
+      'Реконструкция аэропортов Екатеринбург, Магас, Владикавказ, Мурманск, Воронеж — свайные основания зданий и сооружений (2011–2015).',
+  },
+];
+
+---
+
+<BaseLayout
+  title="География работ"
+  description="Активные базы в Москве и Краснодарском крае. Работаем по всей России. Опыт команды охватывает Башкортостан, Татарстан, Ингушетию, Свердловскую область, аэропорты Урала, Северного Кавказа и Поволжья."
+>
+  <HeroPage
+    eyebrow="География"
+    title="Работаем по всей России"
+    lead="Активные базы — в Москве и Краснодарском крае. Туда можем выйти в течение недели после подписания договора. В другие регионы мобилизуем технику по согласованию с заказчиком — транспортная логистика рассчитывается под объект."
+    imageSrc="/images/hero/geography.jpg"
+  />
+
+  <Breadcrumbs items={[{ label: 'География' }]} />
+
+  <Section>
+    <p class="eyebrow">Регионы</p>
+    <h2>Где работала инженерная команда</h2>
+    <ul class="regions-list">
+      {regions.map((r) => (
+        <li>
+          <div class="region-meta">
+            <h3>{r.title}</h3>
+            <span class="region-activity">{r.activity}</span>
+          </div>
+          <p>{r.objects}</p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section dark tight>
+    <p class="eyebrow">Логистика мобилизации</p>
+    <h2>Как мы выходим в новый регион</h2>
+    <ol class="logistic-steps">
+      <li>
+        <span class="step-num">01</span>
+        <div>
+          <h3>Изучение проекта</h3>
+          <p>Получаем геологию, проект, ведомость свай, схему площадки. Считаем объёмы, оцениваем целесообразность мобилизации в данный регион.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">02</span>
+        <div>
+          <h3>Транспортная схема</h3>
+          <p>Транспортировка буровой Casagrande B300 — отдельный логистический проект: трал, разрешения, маршруты, охрана груза. Это включается в смету.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">03</span>
+        <div>
+          <h3>Размещение бригады</h3>
+          <p>Прорабатываем размещение машинистов и помощников бурильщиков, сменность, охрану труда, медобслуживание.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">04</span>
+        <div>
+          <h3>Локальная поддержка</h3>
+          <p>Привлекаем местных подрядчиков на вспомогательные работы — поставка бетона, аренда крана, грузоперевозки на площадке.</p>
+        </div>
+      </li>
+    </ol>
+  </Section>
+
+  <CTASection />
+</BaseLayout>
+
+<style>
+  .regions-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .regions-list li {
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--color-line);
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .regions-list li {
+      grid-template-columns: 1fr 2fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+  }
+
+  .region-meta h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.125rem;
+  }
+
+  .region-activity {
+    color: var(--color-accent);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+  }
+
+  .regions-list p {
+    color: var(--color-mute);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .logistic-steps {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    counter-reset: stepnum;
+  }
+
+  .logistic-steps li {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--color-line-dark);
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .logistic-steps li {
+      grid-template-columns: 80px 1fr;
+      gap: 2rem;
+    }
+  }
+
+  .step-num {
+    color: var(--color-accent);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+
+  .logistic-steps h3 {
+    color: var(--color-paper);
+    font-size: 1.0625rem;
+    margin: 0 0 0.5rem;
+  }
+
+  .logistic-steps p {
+    color: var(--color-mute-light);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+</style>

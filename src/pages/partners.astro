@@ -1,0 +1,303 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroPage from '../components/HeroPage.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Section from '../components/Section.astro';
+import PartnersStrip from '../components/PartnersStrip.astro';
+import CTASection from '../components/CTASection.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title="Партнёры и заказчики"
+  description="Заказчики уровня ГК «Автодор», ПАО «Россети Московский регион», ООО «Крафтбау Инвест». Партнёрская группа компаний полного цикла: проектирование, монолит, сети, генподряд."
+>
+  <HeroPage
+    eyebrow="Партнёры"
+    title="Партнёрская группа компаний полного цикла"
+    lead="От проектирования и инженерных сетей до монолита и генподряда — каждое направление в группе закрывает специализированная команда. Один заказчик может получить полный комплекс работ через нашу сеть."
+    imageSrc="/images/hero/partners.jpg"
+  />
+
+  <Breadcrumbs items={[{ label: 'Партнёры' }]} />
+
+  <Section>
+    <PartnersStrip
+      variant="trust"
+      heading="Кто уже доверяет команде"
+      caption="Заказчики, генподрядчики и государственные структуры, для которых мы выполняли буровые и свайные работы. Порядок отражает значимость и роль."
+    />
+  </Section>
+
+  <Section dark>
+    <p class="eyebrow">Партнёрская группа</p>
+    <h2>Компании полного цикла</h2>
+    <p class="section-lead" style="color: var(--color-mute-light);">
+      Каждая компания группы имеет свою специализацию и собственный опыт. Вместе закрываем полный цикл — от изысканий и проекта до сданного фундамента, монолита, металлоконструкций и инженерных сетей.
+    </p>
+
+    <div class="partners-detail">
+      {site.partners.map((p) => (
+        <article class="partner-card" id={p.slug}>
+          <header>
+            <p class="partner-role">{p.role}</p>
+            <h3 class="partner-name">{p.name}</h3>
+          </header>
+          <p class="partner-summary">{p.summary}</p>
+
+          {p.keyProjects && (
+            <details class="partner-projects">
+              <summary>Ключевые объекты партнёра</summary>
+              <ul>
+                {p.keyProjects.map((proj) => (
+                  <li>{proj}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+
+          <dl class="partner-meta">
+            {p.address && (
+              <>
+                <dt>Адрес</dt>
+                <dd>{p.address}</dd>
+              </>
+            )}
+            {p.phone && (
+              <>
+                <dt>Телефон</dt>
+                <dd>{p.phone}</dd>
+              </>
+            )}
+            {p.email && (
+              <>
+                <dt>Email</dt>
+                <dd>{p.email}</dd>
+              </>
+            )}
+            {p.inn && (
+              <>
+                <dt>ИНН</dt>
+                <dd>{p.inn}{p.kpp ? ` · КПП ${p.kpp}` : ''}</dd>
+              </>
+            )}
+            {p.ogrn && (
+              <>
+                <dt>ОГРН</dt>
+                <dd>{p.ogrn}</dd>
+              </>
+            )}
+          </dl>
+        </article>
+      ))}
+    </div>
+  </Section>
+
+  <Section tight>
+    <div class="model">
+      <p class="eyebrow">Модель работы</p>
+      <h2>Как мы выходим вместе на объект</h2>
+      <ol class="model-steps">
+        <li>
+          <strong>Запрос на полный цикл фундамента под ключ.</strong> Координатор — наша команда. Внутри группы делим задачи по специализации.
+        </li>
+        <li>
+          <strong>Проектирование и согласование.</strong> ООО «Промос» готовит проектную и рабочую документацию, защищает её в Госэкспертизе, ведёт авторский надзор.
+        </li>
+        <li>
+          <strong>Буровые и свайные работы.</strong> Наша инженерная команда устраивает свайное поле под объект.
+        </li>
+        <li>
+          <strong>Монолит и металлоконструкции.</strong> ООО «РСМ 40» выполняет ростверки, монолитные части и металлические конструкции.
+        </li>
+        <li>
+          <strong>Инженерные сети.</strong> ООО «Система-С» устраивает внутренние и наружные сети — водопровод, канализация, отопление, вентиляция, кондиционирование, противопожарные системы.
+        </li>
+        <li>
+          <strong>Генподряд крупных контрактов.</strong> ООО «Мосты и Тоннели» выступает генеральным подрядчиком на 44-ФЗ тендерах свыше 10 млн руб., мы работаем у него на субподряде по буровой части.
+        </li>
+      </ol>
+    </div>
+  </Section>
+
+  <CTASection
+    title="Нужен полный цикл фундаментных работ?"
+    text="Передайте техническое задание, и мы предложим оптимальную конфигурацию работ внутри партнёрской группы — от изысканий до сданного фундамента."
+  />
+</BaseLayout>
+
+<style>
+  .section-lead {
+    color: var(--color-mute);
+    max-width: 60ch;
+    line-height: 1.6;
+    margin-top: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .partners-detail {
+    display: grid;
+    gap: 0;
+    margin-top: 2rem;
+    border-top: 1px solid var(--color-line-dark);
+  }
+
+  .partner-card {
+    padding-block: 2.5rem;
+    border-bottom: 1px solid var(--color-line-dark);
+  }
+
+  .partner-card header {
+    margin-bottom: 1rem;
+  }
+
+  .partner-role {
+    color: var(--color-accent);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+
+  .partner-card .partner-name {
+    color: var(--color-paper);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin: 0;
+    letter-spacing: 0.005em;
+  }
+
+  @media (min-width: 768px) {
+    .partner-card .partner-name {
+      font-size: 1.75rem;
+    }
+  }
+
+  .partner-summary {
+    color: var(--color-mute-light);
+    line-height: 1.65;
+    margin: 0 0 1.5rem;
+    max-width: 70ch;
+  }
+
+  .partner-projects {
+    margin: 0 0 1.5rem;
+    background: var(--color-surface);
+    border-left: 2px solid var(--color-accent);
+  }
+
+  .partner-projects summary {
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    color: var(--color-paper);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .partner-projects summary::after {
+    content: '+';
+    color: var(--color-accent);
+    font-size: 1.25rem;
+    transition: transform 200ms;
+  }
+
+  .partner-projects[open] summary::after {
+    transform: rotate(45deg);
+  }
+
+  .partner-projects ul {
+    list-style: none;
+    padding: 0 1.25rem 1.5rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: var(--color-mute-light);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .partner-projects li {
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .partner-projects li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 8px;
+    height: 1px;
+    background: var(--color-accent);
+  }
+
+  .partner-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem 0;
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-line-dark);
+  }
+
+  @media (min-width: 640px) {
+    .partner-meta {
+      grid-template-columns: 140px 1fr;
+      gap: 0.5rem 1.5rem;
+      align-items: baseline;
+    }
+  }
+
+  .partner-meta dt {
+    color: var(--color-mute);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+
+  .partner-meta dd {
+    margin: 0;
+    color: var(--color-paper);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .model-steps {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    counter-reset: stepnum;
+  }
+
+  .model-steps li {
+    counter-increment: stepnum;
+    position: relative;
+    padding: 1.5rem 0 1.5rem 4rem;
+    border-bottom: 1px solid var(--color-line);
+    color: var(--color-ink-2);
+    line-height: 1.6;
+  }
+
+  .model-steps li::before {
+    content: counter(stepnum, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 1.5rem;
+    color: var(--color-accent);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+
+  .model-steps li strong {
+    color: var(--color-ink);
+  }
+</style>
