@@ -9,7 +9,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "bash scripts/deploy.sh",
+    "ship": "git push origin main && npm run deploy"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.6",
