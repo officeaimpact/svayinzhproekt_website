@@ -1,0 +1,67 @@
+---
+import { site } from '../data/site';
+
+const counterId = site.analytics.yandexMetrikaId;
+---
+
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+
+  (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+  })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109415047', 'ym');
+
+  ym(109415047, 'init', {
+    ssr: true,
+    webvisor: true,
+    clickmap: true,
+    ecommerce: "dataLayer",
+    referrer: document.referrer,
+    url: location.href,
+    accurateTrackBounce: true,
+    trackLinks: true
+  });
+
+  (function () {
+    var counterId = 109415047;
+
+    function reachGoal(goal, params) {
+      if (typeof window.ym === 'function') {
+        window.ym(counterId, 'reachGoal', goal, params || {});
+      }
+    }
+
+    document.addEventListener('click', function (event) {
+      var target = event.target;
+      var link = target && target.closest ? target.closest('a[href]') : null;
+      if (!link) return;
+
+      var href = link.getAttribute('href') || '';
+      var params = {
+        href: href,
+        page: window.location.pathname
+      };
+
+      if (href.indexOf('tel:') === 0) reachGoal('phone_click', params);
+      if (href.indexOf('mailto:') === 0) reachGoal('email_click', params);
+      if (href.indexOf('wa.me') !== -1 || href.indexOf('whatsapp') !== -1) reachGoal('whatsapp_click', params);
+      if (href.indexOf('t.me') !== -1 || href.indexOf('telegram') !== -1) reachGoal('telegram_click', params);
+    });
+
+    window.addEventListener('lead-form-success', function (event) {
+      reachGoal('lead_form_success', {
+        source: event.detail && event.detail.source ? event.detail.source : 'site',
+        page: window.location.pathname
+      });
+    });
+  })();
+</script>
+
+<noscript>
+  <div>
+    <img src={`https://mc.yandex.ru/watch/${counterId}`} style="position:absolute; left:-9999px;" alt="" />
+  </div>
+</noscript>

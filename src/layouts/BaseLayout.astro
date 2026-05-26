@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SEO from '../components/SEO.astro';
+import YandexMetrika from '../components/YandexMetrika.astro';
 
 interface Props {
   title: string;
@@ -31,6 +32,7 @@ const props = Astro.props;
       <slot />
     </main>
     <Footer />
+    <YandexMetrika />
 
     <style>
       .skip-link {

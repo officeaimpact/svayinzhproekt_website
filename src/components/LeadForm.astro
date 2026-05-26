@@ -91,7 +91,7 @@ const endpoint = site.forms.endpoint;
           inputmode="tel"
           placeholder="+7 (___) ___-__-__"
           class="input"
-          pattern="^[\+\d\s\-\(\)]{10,20}$"
+          pattern="^[0-9+() -]{10,20}$"
         />
         <p class="error" data-error="phone"></p>
       </div>
@@ -273,27 +273,28 @@ const endpoint = site.forms.endpoint;
             throw new Error(result.message || 'Не удалось отправить заявку');
           }
 
-        showStatus(
-          'success',
-          `<svg class="status-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-              <path d="M7.5 12.5l3 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <div>
-              <strong>Заявка отправлена.</strong>
-              Свяжемся с вами в течение рабочего дня. Если срочно — звоните <a href="tel:+79182096710">+7 (918) 209-67-10</a>.
-            </div>`,
-        );
-        form.reset();
+          showStatus(
+            'success',
+            `<svg class="status-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                <path d="M7.5 12.5l3 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div>
+                <strong>Заявка отправлена.</strong>
+                Свяжемся с вами в течение рабочего дня. Если срочно — звоните <a href="tel:+79182096710">+7 (918) 209-67-10</a>.
+              </div>`,
+          );
+          window.dispatchEvent(new CustomEvent('lead-form-success', { detail: { source } }));
+          form.reset();
 
-        if (pageUrlInput) {
-          pageUrlInput.value = window.location.href;
-        }
-      } catch (err) {
-        console.error('Lead form submit failed:', err);
-        showStatus(
-          'error',
-          `<svg class="status-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          if (pageUrlInput) {
+            pageUrlInput.value = window.location.href;
+          }
+        } catch (err) {
+          console.error('Lead form submit failed:', err);
+          showStatus(
+            'error',
+            `<svg class="status-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
               <path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
@@ -301,8 +302,8 @@ const endpoint = site.forms.endpoint;
               <strong>Не удалось отправить заявку.</strong>
               Свяжитесь напрямую: <a href="tel:+79182096710">+7 (918) 209-67-10</a> или <a href="mailto:office@svayinzhproekt.ru">office@svayinzhproekt.ru</a>
             </div>`,
-        );
-      } finally {
+          );
+        } finally {
           if (submitBtn) submitBtn.disabled = false;
           form.classList.remove('is-loading');
         }
