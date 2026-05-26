@@ -11,17 +11,13 @@ const year = new Date().getFullYear();
         <a href="/" class="footer-logo" aria-label={`Главная страница ${site.brand}`}>
           <img
             src="/images/logo-mark.png"
-            alt=""
+            alt={site.brand}
             class="footer-logo-mark"
             width="605"
             height="490"
             loading="lazy"
             decoding="async"
-            aria-hidden="true"
           />
-          <span class="footer-brand-name">
-            <span>Свай</span><span class="accent">Инж</span><span>Проект</span>
-          </span>
         </a>
         <p class="footer-tag">{site.tagline}</p>
         <p class="footer-desc">
@@ -139,27 +135,20 @@ const year = new Date().getFullYear();
   .footer-logo {
     display: inline-flex;
     align-items: center;
-    gap: 0.875rem;
     margin-bottom: 1.25rem;
   }
 
   .footer-logo-mark {
-    height: 52px;
+    height: 72px;
     width: auto;
     display: block;
     flex-shrink: 0;
   }
 
-  .footer-brand-name {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--color-paper);
-    letter-spacing: 0.01em;
-  }
-
-  .footer-brand-name .accent {
-    color: var(--color-accent);
+  @media (min-width: 768px) {
+    .footer-logo-mark {
+      height: 80px;
+    }
   }
 
   .footer-tag {

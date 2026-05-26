@@ -51,6 +51,18 @@
     --header-h: 76px;
   }
 
+  @media (min-width: 768px) {
+    :root {
+      --header-h: 84px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    :root {
+      --header-h: 88px;
+    }
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;

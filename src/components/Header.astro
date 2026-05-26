@@ -22,20 +22,13 @@ const currentPath = Astro.url.pathname;
     <a href="/" class="logo" aria-label={`Главная страница ${site.brand}`}>
       <img
         src="/images/logo-mark.png"
-        alt=""
+        alt={site.brand}
         class="logo-mark-img"
         width="605"
         height="490"
         loading="eager"
         decoding="async"
-        aria-hidden="true"
       />
-      <span class="logo-text">
-        <span class="logo-text-main">
-          <span>Свай</span><span class="accent">Инж</span><span>Проект</span>
-        </span>
-        <span class="logo-text-sub">{site.tagline}</span>
-      </span>
     </a>
 
     <div class="header-actions">
@@ -158,9 +151,16 @@ const currentPath = Astro.url.pathname;
     min-width: 0;
   }
 
+  @media (min-width: 768px) {
+    .header-inner {
+      min-height: 84px;
+    }
+  }
+
   @media (min-width: 1280px) {
     .header-inner {
       gap: 1.5rem;
+      min-height: 88px;
     }
   }
 
@@ -173,13 +173,15 @@ const currentPath = Astro.url.pathname;
   .logo {
     display: flex;
     align-items: center;
-    gap: 0.875rem;
     color: var(--color-paper);
     flex-shrink: 0;
+    /* Чуть-чуть «выпускаем» знак за верх/низ строки навигации,
+       чтобы при компактном хедере он смотрелся крупно и уверенно. */
+    margin-block: -4px;
   }
 
   .logo-mark-img {
-    height: 44px;
+    height: 56px;
     width: auto;
     display: block;
     flex-shrink: 0;
@@ -187,32 +189,14 @@ const currentPath = Astro.url.pathname;
 
   @media (min-width: 768px) {
     .logo-mark-img {
-      height: 48px;
+      height: 64px;
     }
   }
 
-  .logo-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.15;
-  }
-
-  .logo-text-main {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.0625rem;
-    letter-spacing: 0.01em;
-    color: var(--color-paper);
-  }
-
-  .logo-text-main .accent {
-    color: var(--color-accent);
-  }
-
-  /* Подзаголовок логотипа скрыт в хедере — есть в hero и футере.
-     Это освобождает место для навигации на ноутбучных разрешениях. */
-  .logo-text-sub {
-    display: none;
+  @media (min-width: 1280px) {
+    .logo-mark-img {
+      height: 68px;
+    }
   }
 
   .header-actions {
