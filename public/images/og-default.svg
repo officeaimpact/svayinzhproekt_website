@@ -11,12 +11,12 @@
   <rect width="1200" height="630" fill="#0B1B2C"/>
   <rect width="1200" height="630" fill="url(#grid)"/>
 
-  <!-- Brand mark — stylized building -->
+  <!-- Brand mark — three-block building over a drill pile -->
   <g transform="translate(80, 80)">
-    <rect x="0" y="6" width="36" height="160" fill="#0B1B2C" stroke="#5B8FB9" stroke-width="3"/>
-    <rect x="46" y="0" width="36" height="170" fill="#E8EEF4"/>
-    <rect x="92" y="22" width="36" height="148" fill="#0084E7"/>
-    <rect x="0" y="172" width="128" height="6" fill="#5B8FB9"/>
+    <rect x="0" y="14" width="36" height="148" fill="#7F8B98"/>
+    <rect x="46" y="0" width="40" height="162" fill="#E8EEF4"/>
+    <rect x="96" y="22" width="36" height="140" fill="#0084E7"/>
+    <polygon points="34,162 98,162 66,210" fill="#C9D1DA"/>
   </g>
 
   <!-- Eyebrow -->
